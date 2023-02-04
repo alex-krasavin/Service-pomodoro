@@ -17,8 +17,20 @@ const getToDo = () => {
     return toDoList;
 }
 
-export const updateTodo = (todoList) => {
-    localStorage.setItem("pomodoro",JSON.stringify(todoList));
+export const updateTodo = (todo) => {
+    const todoList = getToDo();
+    if(!todoList.length) {
+        return
+    }
+
+    if(Array.isArray(todo)) {
+        localStorage.setItem("pomodoro",JSON.stringify(todo));
+    }else {
+        const todoItem = todoList.find(item => item.id === todo.id);
+        todoItem.title = todo.title;
+        todoItem.pomodoro = todo.pomodoro;
+        localStorage.setItem("pomodoro",JSON.stringify(todoList));
+    }
 }
 
 const createToDoItem = (todo) => {
@@ -82,8 +94,9 @@ export const createToDo = () => {
         if(target.classList.contains("todo__del")) {
             const tasks = getToDo();
             const newTasks = tasks.filter(task => task.id !== target.dataset.id);
-            updateTodo(newTasks)
             target.closest(".todo__item").remove();
+            updateTodo(newTasks)
+
             if(newTasks.length) {
                 titleElem.textContent = newTasks[newTasks.length -1].title
             }else {
@@ -94,11 +107,12 @@ export const createToDo = () => {
         if(target.classList.contains("todo__edit")) {
             const currentTodo = target.previousElementSibling;
             const title = prompt("Ведите имя задачи",currentTodo.textContent);
-            currentTodo.textContent = title;
-            titleElem.textContent = title;
             const tasks = getToDo();
-            tasks.forEach(task => task.id === currentTodo.dataset.id ? task.title = title : task.title);
-            updateTodo(tasks);
+            const task = tasks.find(task => task.id === currentTodo.dataset.id);
+            task.title = title;
+            state.activeTodo = task;
+            showToDo();
+            updateTodo(task);
         }
 
         if(target.classList.contains("todo__btn")) {
@@ -108,18 +122,17 @@ export const createToDo = () => {
             showToDo();
             changeActiveBtn("work");
             stop();
-            // const currentTask = tasks.filter(task => task.id === target.dataset.id)[0];
-            // titleElem.textContent = currentTask.title;
-            // countPomodoro.textContent = currentTask.pomodoro;
         }
 
         if(target.classList.contains("todo__add")) {
-            let title = prompt("Ведите имя задачи")?.trim();
-            const todo = addTodo(title);
-            createToDoItem(todo);
+            let title = "";
+            do{
+               title = prompt("Ведите имя задачи")?.trim();
+               
+            }while(!title) {
+                const todo = addTodo(title);
+                createToDoItem(todo);
+            }
         }
-
-
     })
 }
-

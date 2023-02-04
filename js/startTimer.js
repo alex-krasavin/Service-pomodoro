@@ -24,11 +24,9 @@ export const startTimer = () => {
         }else {
             state.status = "work";
         }
-        console.log(state.activeTodo.pomodoro)
         alarm();
         state.timeLeft = state[state.status] * 60;
         changeActiveBtn(state.status);
         startTimer();
-        // updateTodo(state.activeTodo,state.activeTodo.pomodoro);
     }
 }
