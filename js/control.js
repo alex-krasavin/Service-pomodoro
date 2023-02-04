@@ -24,7 +24,7 @@ export const changeActiveBtn = (stateBtn) => {
 
 const start = () => {
     if(state.isActive) {
-        clearTimeout(state.timerId)
+        clearInterval(state.timerId)
         state.isActive = false;
         btnStart.textContent = "Старт";
     }else {
@@ -35,7 +35,7 @@ const start = () => {
 }
 
 export const stop = () => {
-    clearTimeout(state.timerId)
+    clearInterval(state.timerId)
     state.isActive = false;
     btnStart.textContent = "Старт";
     state.timeLeft = state[state.status] * 60;

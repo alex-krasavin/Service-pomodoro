@@ -3,8 +3,9 @@ import { stop } from "./control.js";
 import { state } from "./state.js";
 
 const titleElem = document.querySelector(".title");
-export let countPomodoro = document.querySelector(".count_num");
+const countPomodoro = document.querySelector(".count_num");
 const toDoListElem = document.querySelector(".todo__list");
+const deefaultTodo = {pomodoro:0,id:"default",title:"Помодоро"};
 
 const btnaddTask = document.createElement("li");
 btnaddTask.classList.add("todo__item");
@@ -49,7 +50,7 @@ const createToDoItem = (todo) => {
     return todo;
 }
 
-const showToDo = () => {
+export const showToDo = () => {
     titleElem.textContent = state.activeTodo.title;
     countPomodoro.textContent = state.activeTodo.pomodoro;
 }
@@ -77,11 +78,7 @@ const renderToDoList = (arrList) => {
 export const createToDo = () => {
     const toDoList = getToDo();
     if(!toDoList.length) {
-        state.activeTodo = {
-            pomodoro:0,
-            id:"default",
-            title:"Помодоро"
-        }
+        state.activeTodo = deefaultTodo;
     }else {
         state.activeTodo = toDoList[toDoList.length - 1];
     }
@@ -98,10 +95,12 @@ export const createToDo = () => {
             updateTodo(newTasks)
 
             if(newTasks.length) {
-                titleElem.textContent = newTasks[newTasks.length -1].title
+                state.activeTodo = newTasks[newTasks.length -1];
             }else {
-                titleElem.textContent = "Помодоро";
+                state.activeTodo = deefaultTodo;
+                stop();
             }
+            showToDo();
         }
 
         if(target.classList.contains("todo__edit")) {
@@ -109,6 +108,7 @@ export const createToDo = () => {
             const title = prompt("Ведите имя задачи",currentTodo.textContent);
             const tasks = getToDo();
             const task = tasks.find(task => task.id === currentTodo.dataset.id);
+            currentTodo.textContent = title;
             task.title = title;
             state.activeTodo = task;
             showToDo();
@@ -127,8 +127,13 @@ export const createToDo = () => {
         if(target.classList.contains("todo__add")) {
             let title = "";
             do{
-               title = prompt("Ведите имя задачи")?.trim();
-               
+               title = prompt("Ведите имя задачи");
+               if(title === null) {
+                return
+               }
+               if(title.trim() === "") {
+                title = prompt("Ведите корректное имя");
+               }
             }while(!title) {
                 const todo = addTodo(title);
                 createToDoItem(todo);
@@ -136,3 +141,4 @@ export const createToDo = () => {
         }
     })
 }
+
